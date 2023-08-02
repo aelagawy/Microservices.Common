@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package >
+	<metadata>
+		<id>$id$</id>
+		<version>$version$</version>
+		<title>$title$</title>
+		<description>$description$</description>
+		<authors>$author$</authors>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<license type="expression">MIT</license>
+		<projectUrl>https://github.com/aelagawy/Microservices.Common</projectUrl>
+		<repository type="git" url="https://github.com/aelagawy/Microservices.Common" />
+		<copyright>$copyright$</copyright>
+		<tags>microservices identity-server localization automapper fluent-validation exception</tags>
+	</metadata>
+</package>
