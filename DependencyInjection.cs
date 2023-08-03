@@ -22,7 +22,7 @@ namespace Microservices.Common
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddCommon(this IServiceCollection services, Assembly assembly, SsoOAuth2Options ssoOAuth2Options)
+        public static IServiceCollection AddCommon(this IServiceCollection services, Assembly assembly, SsoOAuth2Options? ssoOAuth2Options = null)
         {
             //AutoMapper
             services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly())).CreateMapper());
@@ -49,22 +49,24 @@ namespace Microservices.Common
 
             services.AddCors();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-               .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-               {
-                   //disable HTTPS validation only on dev/test
-                   options.RequireHttpsMetadata = false;
-                   options.BackchannelHttpHandler = new HttpClientHandler { ServerCertificateCustomValidationCallback = delegate { return true; } };
+            if (ssoOAuth2Options != null)
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                    {
+                        //disable HTTPS validation only on dev/test
+                        //options.RequireHttpsMetadata = false;
+                        //options.BackchannelHttpHandler = new HttpClientHandler { ServerCertificateCustomValidationCallback = delegate { return true; } };
 
-                   options.Authority = ssoOAuth2Options.Authority;
+                        options.Authority = ssoOAuth2Options.Authority;
 
-                   options.TokenValidationParameters = new TokenValidationParameters
-                   {
-                       //todo..harden this configuration
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateAudience = false,
+                        };
+                    });
+            }
 
-                       ValidateAudience = false,
-                   };
-               });
 
             services.AddControllers();
 
@@ -97,7 +99,7 @@ namespace Microservices.Common
 
         #region Private Functions
 
-        private static IServiceCollection AddSwagger(this IServiceCollection services, Assembly assembly, SsoOAuth2Options ssoOAuth2Options)
+        private static IServiceCollection AddSwagger(this IServiceCollection services, Assembly assembly, SsoOAuth2Options? ssoOAuth2Options = null)
         {
             services.AddSwaggerGen(c =>
             {
@@ -105,32 +107,37 @@ namespace Microservices.Common
                 c.EnableAnnotations();
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = assembly.GetName().Name, Version = "v1" });
                 //note: see how to configure Postman to auto-generate the token here: https://stackoverflow.com/a/58197959/249336
-                c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+
+                if (ssoOAuth2Options != null)
                 {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.OAuth2,
-                    Flows = new OpenApiOAuthFlows
+                    c.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
                     {
-                        ClientCredentials = new OpenApiOAuthFlow
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.OAuth2,
+                        Flows = new OpenApiOAuthFlows
                         {
-                            TokenUrl = new Uri($"{ssoOAuth2Options.Authority}/connect/token"),
-                            Scopes = new Dictionary<string, string>
+                            ClientCredentials = new OpenApiOAuthFlow
+                            {
+                                TokenUrl = new Uri($"{ssoOAuth2Options.Authority}/connect/token"),
+                                Scopes = new Dictionary<string, string>
                             {
                                  { "*", "All APIs" },
                             }
+                            },
+                            //Password = new OpenApiOAuthFlow
+                            //{
+                            //    TokenUrl = new Uri($"{Startup.SsoOAuth2Options.Authority}/connect/token"),
+                            //    Scopes = new Dictionary<string, string>
+                            //    {
+                            //         { "*", "All APIs" },
+                            //    }
+                            //}
                         },
-                        //Password = new OpenApiOAuthFlow
-                        //{
-                        //    TokenUrl = new Uri($"{Startup.SsoOAuth2Options.Authority}/connect/token"),
-                        //    Scopes = new Dictionary<string, string>
-                        //    {
-                        //         { "*", "All APIs" },
-                        //    }
-                        //}
-                    },
-                    Scheme = JwtBearerDefaults.AuthenticationScheme,
-                    In = ParameterLocation.Header,
-                });
+                        Scheme = JwtBearerDefaults.AuthenticationScheme,
+                        In = ParameterLocation.Header,
+                    });
+                }
+
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {
@@ -142,7 +149,7 @@ namespace Microservices.Common
                                     Id = JwtBearerDefaults.AuthenticationScheme
                                 }
                             },
-                            new string[] {}
+                            Array.Empty<string>()
                     }
                 });
 
@@ -153,8 +160,7 @@ namespace Microservices.Common
                         return new[] { api.GroupName };
                     }
 
-                    var controllerActionDescriptor = api.ActionDescriptor as ControllerActionDescriptor;
-                    if (controllerActionDescriptor != null)
+                    if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
                     {
                         return new[] { controllerActionDescriptor.ControllerName };
                     }
@@ -179,7 +185,7 @@ namespace Microservices.Common
                 string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
                 c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", $"{assembly.GetName().Name} v1");
             });
-            
+
             return builder;
         }
 
