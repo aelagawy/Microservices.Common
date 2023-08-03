@@ -1,8 +1,7 @@
-﻿using Microservices.Common.Localization.JsonLocalizer;
-using Microsoft.Extensions.Caching.Distributed;
+﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Localization;
 
-namespace Nec.EServices.Common.Localization.JsonLocalizer
+namespace Microservices.Common.Localization.JsonLocalizer
 {
     public class JsonStringLocalizerFactory : IStringLocalizerFactory
     {
