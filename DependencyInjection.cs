@@ -4,6 +4,7 @@ using MediatR;
 using Microservices.Common.Behaviours;
 using Microservices.Common.Interfaces;
 using Microservices.Common.Localization.DbLocalizer;
+using Microservices.Common.Localization.JsonLocalizer;
 using Microservices.Common.Middlewares;
 using Microservices.Common.Options;
 using Microservices.Common.Services;
@@ -15,7 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Nec.EServices.Common.Localization.JsonLocalizer;
 using System.Reflection;
 
 namespace Microservices.Common
