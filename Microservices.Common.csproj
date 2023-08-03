@@ -26,10 +26,16 @@
 	<PropertyGroup>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/aelagawy/Microservices.Common.git</RepositoryUrl>
+		<Title> </Title>
+		<Version>1.0.1</Version>
+		<Description>A lightweight package that simplifies microservices development by providing utilities for authentication, validation, localization, mapping, code documentation, exception handling, .. and more.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="README.md" Pack="true" PackagePath="\"/>
-		<None Include="LICENSE.txt" Pack="true" PackagePath=""/>
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
 	</ItemGroup>
+
 </Project>
