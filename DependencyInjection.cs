@@ -39,7 +39,10 @@ namespace Microservices.Common
             services.AddScoped<ICurrentUser, CurrentUser>();
 
             //Localization
+            services.AddLocalization();
+            services.AddDistributedMemoryCache();
             services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+
             Type? iApplicationDbContextType = assembly.GetTypes().SingleOrDefault(x => x.Name == "IApplicationDbContext");
             if (iApplicationDbContextType != default)
             {
