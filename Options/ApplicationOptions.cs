@@ -6,7 +6,7 @@
     /// </summary>
     public class ApplicationOptions
     {
-        public const string Application = "Application";
+        public const string KEY = "Application";
         public string PathBase { get; set; }
     }
 }
