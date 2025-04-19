@@ -6,7 +6,7 @@
     /// </summary>
     public class ApiGatewayOptions
     {
-        public const string ApiGateway = "ApiGateway";
+        public const string KEY = "ApiGateway";
 
         public string BaseUrl { get; set; }
     }

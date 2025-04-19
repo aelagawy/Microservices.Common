@@ -41,7 +41,7 @@ namespace Microservices.Common
                 ? item.Split(_localizationSplittingCharacter, StringSplitOptions.None).Select(i => i.Trim()).ToArray()
                 : new string[] { item, item };
 
-            return new TranslationDto { Ar = arr[0], En = arr[1] };
+            return new TranslationDto(arr[0], arr[1]);
         }
 
         public static string? ToLocale(this string item)

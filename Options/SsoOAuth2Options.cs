@@ -6,7 +6,7 @@
     /// </summary>
     public class SsoOAuth2Options
     {
-        public const string SSO_OAUTH2 = "SsoOAuth2";
+        public const string KEY = "SsoOAuth2";
 
         public string Authority { get; set; }
         public string ClientId { get; set; }

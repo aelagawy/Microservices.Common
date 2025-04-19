@@ -9,7 +9,7 @@ namespace Microservices.Common.Services
     public class CurrentUser : ICurrentUser
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string? _userId;
+        private readonly string _userId;
         private readonly string? _email;
         private readonly string? _clientId;
         private readonly IEnumerable<string>? _roles;
@@ -18,7 +18,7 @@ namespace Microservices.Common.Services
         {
             _httpContextAccessor = httpContextAccessor;
 
-            _userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.PreferredUserName);
+            _userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.PreferredUserName) ?? "unknown";
             _email = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.Email);
             _clientId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.ClientId);
             _roles = _httpContextAccessor.HttpContext?.User?.FindAll("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
@@ -27,7 +27,7 @@ namespace Microservices.Common.Services
         }
 
         public string? Email => _email?.ToLower();
-        public string? UserId => _userId?.ToLower();
+        public string UserId => _userId.ToLower();
         public string? ClientId => _clientId?.ToLower();
         public UserType UserType { get; } = UserType.Unknown;
         public IEnumerable<string> Roles => _roles ?? new List<string>();

@@ -9,12 +9,12 @@ namespace Microservices.Common.Middlewares
     public class CustomExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger _logger;
+        //private readonly ILogger _logger;
 
-        public CustomExceptionHandlerMiddleware(RequestDelegate next, ILogger logger)
+        public CustomExceptionHandlerMiddleware(RequestDelegate next/*, ILogger logger*/)
         {
             _next = next;
-            _logger = logger;
+            //_logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -26,7 +26,7 @@ namespace Microservices.Common.Middlewares
             catch (Exception ex)
             {
                 //TODO: implement serilog
-                _logger.LogError(ex, "CustomExceptionHandlerMiddleware");
+                //_logger.LogError(ex, "CustomExceptionHandlerMiddleware");
                 await HandleExceptionAsync(context, ex);
             }
         }

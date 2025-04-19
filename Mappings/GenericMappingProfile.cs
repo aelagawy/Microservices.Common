@@ -9,7 +9,7 @@ namespace Microservices.Common.Mappings
 
         public GenericMappingProfile()
         {
-            string serviceAssembly = ConsumerServicePattern().Match(Assembly.GetExecutingAssembly().Location).Value;
+            string serviceAssembly = Regex.Match(Assembly.GetExecutingAssembly().Location, "(\\w*).Api").Value;
 
             ApplyMappingsFromAssembly(Assembly.Load(serviceAssembly));
             //todo: ignore attribute globaly
@@ -34,7 +34,7 @@ namespace Microservices.Common.Mappings
             }
         }
 
-        [GeneratedRegex("(\\w*).Api")]
-        private static partial Regex ConsumerServicePattern();
+        //[GeneratedRegex("(\\w*).Api")]
+        //public static partial Regex ConsumerServicePattern();
     }
 }

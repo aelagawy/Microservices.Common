@@ -21,7 +21,7 @@
 
         private static string GetFileType(string base64String)
         {
-            return base64String.Substring(0, 5).ToUpper() switch
+            return base64String[..5].ToUpper() switch
             {
                 "IVBOR" => "image/png",
                 "/9J/4" => "image/jpg",
