@@ -190,8 +190,11 @@ namespace Microservices.Common
             builder.UseSwagger();
             builder.UseSwaggerUI(c =>
             {
-                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
-                c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", $"{assembly.GetName().Name} v1");
+                //string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+                //c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", $"{assembly.GetName().Name} v1");
+
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", $"{assembly.GetName().Name} v1");
+
             });
 
             return builder;
