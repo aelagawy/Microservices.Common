@@ -26,7 +26,7 @@ namespace Microservices.Common
         public static IServiceCollection AddCommon(this IServiceCollection services, Assembly assembly, SsoOAuth2Options? ssoOAuth2Options = null)
         {
             //AutoMapper
-            services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), null).CreateMapper());
+            services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), new NullLoggerFactory()).CreateMapper());
             //services.AddAutoMapper(assembly);
             services.AddAutoMapper(cfg =>
             {
