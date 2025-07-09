@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
@@ -25,8 +26,12 @@ namespace Microservices.Common
         public static IServiceCollection AddCommon(this IServiceCollection services, Assembly assembly, SsoOAuth2Options? ssoOAuth2Options = null)
         {
             //AutoMapper
-            services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly())).CreateMapper());
-            services.AddAutoMapper(assembly);
+            services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), null).CreateMapper());
+            //services.AddAutoMapper(assembly);
+            services.AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(assembly);
+            });
 
             //FluentValidation
             services.AddValidatorsFromAssembly(assembly);

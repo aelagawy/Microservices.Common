@@ -9,7 +9,7 @@ namespace Microservices.Common.Middlewares
     public class CustomExceptionHandlerMiddleware
     {
         private readonly RequestDelegate _next;
-        //private readonly ILogger _logger;
+        private readonly ILogger _logger;
 
         public CustomExceptionHandlerMiddleware(RequestDelegate next/*, ILogger logger*/)
         {
