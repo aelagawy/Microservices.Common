@@ -11,6 +11,7 @@ namespace Microservices.Common.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly string _userId;
         private readonly string? _email;
+        private readonly string? _name;
         private readonly string? _clientId;
         private readonly IEnumerable<string>? _roles;
 
@@ -18,19 +19,23 @@ namespace Microservices.Common.Services
         {
             _httpContextAccessor = httpContextAccessor;
 
-            _userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.PreferredUserName) ?? "unknown";
-            _email = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.Email);
+            _userId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "unknown";
+            _email = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
+            _name = _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Name);
             _clientId = _httpContextAccessor.HttpContext?.User?.FindFirstValue(JwtClaimTypes.ClientId);
-            _roles = _httpContextAccessor.HttpContext?.User?.FindAll("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")
+            _roles = _httpContextAccessor.HttpContext?.User?.FindAll(ClaimTypes.Role)
                 .Select(x => x.Value)
                 .ToList();
         }
 
         public string? Email => _email?.ToLower();
+        public string? NameAr => !string.IsNullOrEmpty(_name) && _name.Contains(';') ? _name.Split(';')[0] : null;
+        public string? NameEn => !string.IsNullOrEmpty(_name) && _name.Contains(';') ? _name.Split(';')[1] : null;
         public string UserId => _userId.ToLower();
         public string? ClientId => _clientId?.ToLower();
-        public UserType UserType { get; } = UserType.Unknown;
-        public IEnumerable<string> Roles => _roles ?? new List<string>();
+        public UserType UserType => _roles.Contains("Admin") ? UserType.Administrator : UserType.Unknown;
+        public IEnumerable<string> Roles => _roles ?? [];
+        public bool IsAdministrator() => UserType == UserType.Administrator;
         public Task<string> Token()
         {
             throw new NotImplementedException();

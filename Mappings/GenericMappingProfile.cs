@@ -9,7 +9,8 @@ namespace Microservices.Common.Mappings
 
         public GenericMappingProfile()
         {
-            string serviceAssembly = Regex.Match(Assembly.GetExecutingAssembly().Location, "(\\w*).Api").Value;
+            string serviceAssembly = "DriveEcho.Api";// Regex.Match(Assembly.GetExecutingAssembly().Location, "(\\w*).Api").Value;
+            //string serviceAssembly =  Regex.Match(Assembly.GetExecutingAssembly().Location, "(\\w*).Api").Value;
 
             ApplyMappingsFromAssembly(Assembly.Load(serviceAssembly));
             //todo: ignore attribute globaly

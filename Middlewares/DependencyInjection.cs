@@ -6,7 +6,7 @@ namespace Microservices.Common.Middlewares
     {
         public static IApplicationBuilder UseCustomMiddleWares(this IApplicationBuilder builder)
         {
-            builder.UseMiddleware<CustomCorsMiddleware>();
+            //builder.UseMiddleware<CustomCorsMiddleware>();
             builder.UseMiddleware<CustomExceptionHandlerMiddleware>();
             builder.UseMiddleware<CultureSwapHandlerMiddleware>();
 

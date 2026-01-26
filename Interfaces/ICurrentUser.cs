@@ -5,10 +5,13 @@ namespace Microservices.Common.Interfaces
     public interface ICurrentUser
     {
         string? Email { get; }
+        string? NameAr { get; }
+        string? NameEn { get; }
         string UserId { get; }
         string? ClientId { get; }
         UserType UserType { get; }
         IEnumerable<string> Roles { get; }
         Task<string> Token();
+        bool IsAdministrator();
     }
 }

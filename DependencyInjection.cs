@@ -10,6 +10,8 @@ using Microservices.Common.Options;
 using Microservices.Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,8 +28,26 @@ namespace Microservices.Common
         public static IServiceCollection AddCommon(this IServiceCollection services, Assembly assembly, SsoOAuth2Options? ssoOAuth2Options = null)
         {
             //AutoMapper
-            services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), new NullLoggerFactory()).CreateMapper());
-            //services.AddAutoMapper(assembly);
+            //services.AddSingleton(provider => new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), new NullLoggerFactory()).CreateMapper());
+            ////services.AddAutoMapper(assembly);
+            //services.AddSingleton(provider =>
+            //{
+            //    var loggerFactory = provider.GetRequiredService<ILoggerFactory>(); // Important!
+            //    return new MapperConfiguration(cfg =>
+            //    {
+            //        cfg.AddMaps(Assembly.GetExecutingAssembly());
+            //    }, loggerFactory).CreateMapper();
+            //});
+
+            services.AddSingleton(provider =>
+            {
+                var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+                return new MapperConfiguration(cfg => cfg.AddMaps(Assembly.GetExecutingAssembly()), loggerFactory)
+                    .CreateMapper();
+            });
+
+
+
             services.AddAutoMapper(cfg =>
             {
                 cfg.AddMaps(assembly);
@@ -161,20 +181,64 @@ namespace Microservices.Common
                     }
                 });
 
+                //c.TagActionsBy(api =>
+                //{
+                //    if (api.GroupName != null)
+                //    {
+                //        return new[] { api.GroupName };
+                //    }
+
+                //    if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
+                //    {
+                //        return new[] { controllerActionDescriptor.ControllerName };
+                //    }
+
+                //    throw new InvalidOperationException("Unable to determine tag for endpoint.");
+                //});
+
                 c.TagActionsBy(api =>
                 {
-                    if (api.GroupName != null)
-                    {
+                    // Prefer API group if set
+                    if (!string.IsNullOrWhiteSpace(api.GroupName))
                         return new[] { api.GroupName };
-                    }
 
-                    if (api.ActionDescriptor is ControllerActionDescriptor controllerActionDescriptor)
-                    {
-                        return new[] { controllerActionDescriptor.ControllerName };
-                    }
+                    // Minimal APIs: ITagsMetadata (IReadOnlyList<string>)
+                    var tagsMeta = api.ActionDescriptor?.EndpointMetadata?
+                        .OfType<ITagsMetadata>()
+                        .FirstOrDefault();
 
-                    throw new InvalidOperationException("Unable to determine tag for endpoint.");
+                    if (tagsMeta != null && tagsMeta.Tags != null && tagsMeta.Tags.Count > 0)
+                        return (IList<string>)tagsMeta.Tags; // IReadOnlyList<string> is fine
+
+                    // MVC attribute [Tags("...")] -> string[]
+                    var tagsAttr = api.ActionDescriptor?.EndpointMetadata?
+                        .OfType<TagsAttribute>()
+                        .FirstOrDefault();
+
+                    if (tagsAttr != null && tagsAttr.Tags != null && tagsAttr.Tags.Count > 0)
+                        return (IList<string>)tagsAttr.Tags;
+
+                    // Conventional controllers
+                    string controller;
+                    if (api.ActionDescriptor?.RouteValues != null &&
+                        api.ActionDescriptor.RouteValues.TryGetValue("controller", out controller) &&
+                        !string.IsNullOrWhiteSpace(controller))
+                        return new[] { controller };
+
+                    // Fallback: first path segment
+                    var segment = api.RelativePath?
+                        .Split('/', System.StringSplitOptions.RemoveEmptyEntries)
+                        .FirstOrDefault();
+
+                    if (!string.IsNullOrWhiteSpace(segment))
+                        return new[] { segment };
+
+                    // Last resort
+                    return new[] { "misc" };
                 });
+
+                // Optional: keep everything visible
+                c.DocInclusionPredicate((docName, api) => true);
                 c.DocInclusionPredicate((name, api) => true);
 
                 var filePath = Path.Combine(AppContext.BaseDirectory, $"{assembly.GetName().Name}.xml");
